@@ -1,5 +1,6 @@
 package io.github.mateuszuran.sisyphus_app.service;
 
+import io.github.mateuszuran.sisyphus_app.dto.WorkGroupDTO;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
@@ -11,8 +12,6 @@ import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -76,5 +75,32 @@ public class WorkGroupServiceImpl implements WorkGroupService {
     public List<WorkApplications> getAllWorkApplicationsFromWorkGroup(String workGroupId) {
         var groupToFind = getWorkGroup(workGroupId);
         return groupToFind.getWorkApplications();
+    }
+
+    public WorkGroupDTO getMappedSingleWorkGroup(String workGroupId) {
+        WorkGroup group = getWorkGroup(workGroupId);
+        return WorkGroupDTO.builder()
+                .id(group.getId())
+                .cv_url(group.getCv_url())
+                .creationTime(group.getCreationTime())
+                .applied(group.getApplied())
+                .denied(group.getDenied())
+                .inProgress(group.getInProgress())
+                .build();
+    }
+
+    public List<WorkGroupDTO> getAllMappedWorkGroups() {
+        var allGroups = getAllGroups();
+        return allGroups
+                .stream()
+                .map(group ->
+                        WorkGroupDTO.builder()
+                                .cv_url(group.getCv_url())
+                                .creationTime(group.getCreationTime())
+                                .applied(group.getApplied())
+                                .denied(group.getDenied())
+                                .inProgress(group.getInProgress())
+                                .build())
+                .toList();
     }
 }
