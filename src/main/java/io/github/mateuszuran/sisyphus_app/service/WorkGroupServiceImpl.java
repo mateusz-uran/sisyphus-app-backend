@@ -68,7 +68,8 @@ public class WorkGroupServiceImpl implements WorkGroupService {
 
     @Override
     public void deleteSingleGroup(String workGroupId) {
-        repository.deleteById(workGroupId);
+        var groupToDelete = getWorkGroup(workGroupId);
+        repository.delete(groupToDelete);
     }
 
     @Override

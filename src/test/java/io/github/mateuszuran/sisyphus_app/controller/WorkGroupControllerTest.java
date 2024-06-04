@@ -19,8 +19,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,7 +37,6 @@ class WorkGroupControllerTest {
     WorkGroupServiceImpl service;
 
     List<WorkGroupDTO> groupDTOS = new ArrayList<>();
-    List<WorkGroup> groups = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
@@ -46,11 +44,6 @@ class WorkGroupControllerTest {
                 WorkGroupDTO.builder().creationTime("date1").build(),
                 WorkGroupDTO.builder().creationTime("date2").build(),
                 WorkGroupDTO.builder().creationTime("date2").build());
-
-        groups = List.of(
-                WorkGroup.builder().creationTime("date1").build(),
-                WorkGroup.builder().creationTime("date2").build(),
-                WorkGroup.builder().creationTime("date2").build());
     }
 
     @Test
@@ -82,13 +75,20 @@ class WorkGroupControllerTest {
     @Test
     void givenWorkGroupId_whenGet_thenReturnSingleWorkGroup() throws Exception {
         //given
-
         when(service.getMappedSingleWorkGroup(anyString())).thenReturn(groupDTOS.get(0));
 
         //when + then
-        mockMvc.perform(get("/group/single").param("workGroupId", "1234"))
+        mockMvc.perform(get("/group/single/1234"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.creationTime").value("date1"));
+    }
+
+    @Test
+    void givenWorkGroupId_whenDelete_thenReturnStatus() throws Exception {
+        //when + then
+        mockMvc.perform(delete("/group/delete/1234"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }

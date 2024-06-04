@@ -139,12 +139,14 @@ public class WorkGroupServiceTest {
     public void givenWorkGroupId_whenExists_thenDeleteWorkGroup() {
         //given
         String workGroupId = "123";
+        WorkGroup groupToDelete = WorkGroup.builder().build();
+        when(repository.findById(workGroupId)).thenReturn(Optional.of(groupToDelete));
 
         //when
         serviceImpl.deleteSingleGroup(workGroupId);
 
         //then
-        verify(repository).deleteById(workGroupId);
+        verify(repository).delete(any(WorkGroup.class));
     }
 
     @Test
