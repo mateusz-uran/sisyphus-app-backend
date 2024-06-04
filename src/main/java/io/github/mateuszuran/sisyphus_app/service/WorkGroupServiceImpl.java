@@ -80,6 +80,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
 
     public WorkGroupDTO getMappedSingleWorkGroup(String workGroupId) {
         WorkGroup group = getWorkGroup(workGroupId);
+        log.info(workGroupId);
         return WorkGroupDTO.builder()
                 .id(group.getId())
                 .cv_url(group.getCv_url())
@@ -96,6 +97,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                 .stream()
                 .map(group ->
                         WorkGroupDTO.builder()
+                                .id(group.getId())
                                 .cv_url(group.getCv_url())
                                 .creationTime(group.getCreationTime())
                                 .applied(group.getApplied())

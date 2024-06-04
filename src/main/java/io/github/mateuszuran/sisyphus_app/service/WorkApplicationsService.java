@@ -10,5 +10,7 @@ public interface WorkApplicationsService {
 
     void deleteWorkApplication(String applicationId);
 
-    WorkApplications updateApplicationStatus(ApplicationStatus status, String applicationId);
+    WorkApplications updateApplicationStatus(String status, String applicationId);
+
+    WorkApplications updateWorkApplicationUrl(String applicationId, String applicationUrl);
 }

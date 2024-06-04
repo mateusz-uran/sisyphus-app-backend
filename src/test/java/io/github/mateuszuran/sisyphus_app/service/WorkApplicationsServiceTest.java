@@ -5,6 +5,7 @@ import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
+import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +27,8 @@ import static org.mockito.Mockito.never;
 @ExtendWith(MockitoExtension.class)
 public class WorkApplicationsServiceTest {
 
+    @Mock
+    TimeUtil util;
     @Mock
     WorkGroupServiceImpl groupService;
     @Mock
@@ -54,6 +57,8 @@ public class WorkApplicationsServiceTest {
     public void givenWorkApplicationId_whenDelete_thenDoNothing() {
         //given
         String workApplicationId = "1234";
+        var workApplication = WorkApplications.builder().build();
+        when(repository.findById(workApplicationId)).thenReturn(Optional.of(workApplication));
 
         //when
         serviceImpl.deleteWorkApplication(workApplicationId);
@@ -66,15 +71,15 @@ public class WorkApplicationsServiceTest {
     public void givenApplicationIdAndStatus_whenUpdate_thenReturnUpdatedApplication() {
         //given
         String workApplicationId = "1234";
-        var newStatus = ApplicationStatus.DENIED;
+        var newStatus = "DENIED";
         WorkApplications work = WorkApplications.builder().workUrl("work1").status(ApplicationStatus.IN_PROGRESS).build();
         when(repository.findById(workApplicationId)).thenReturn(Optional.of(work));
 
-        WorkApplications updatedWork = WorkApplications.builder().workUrl("work1").status(newStatus).build();
+        WorkApplications updatedWork = WorkApplications.builder().workUrl("work1").status(ApplicationStatus.valueOf(newStatus)).build();
         when(repository.save(any(WorkApplications.class))).thenReturn(updatedWork);
 
         //when
-        var result = serviceImpl.updateApplicationStatus(newStatus, workApplicationId);
+        var result = serviceImpl.updateApplicationStatus(workApplicationId, newStatus);
 
         //then
         assertThat(result).isEqualTo(updatedWork);
@@ -85,8 +90,24 @@ public class WorkApplicationsServiceTest {
         //given
         String workApplicationId = "1234";
         //when
-        assertThrows(IllegalStateException.class, () -> serviceImpl.updateApplicationStatus(ApplicationStatus.SEND, null));
+        assertThrows(IllegalStateException.class, () -> serviceImpl.updateApplicationStatus("SEND", null));
         verify(repository, never()).findById(workApplicationId);
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    public void givenWorkApplicationIdAndUrl_whenUpdate_thenReturnUpdatedWorkApplication() {
+        //given
+        String workId = "1234";
+        String newWorkUrl = "new_url";
+        WorkApplications oldWork = WorkApplications.builder().workUrl("old_url").build();
+        when(repository.findById(workId)).thenReturn(Optional.of(oldWork));
+        when(repository.save(any(WorkApplications.class))).thenReturn(WorkApplications.builder().workUrl(newWorkUrl).build());
+
+        //when
+        var updatedWork = serviceImpl.updateWorkApplicationUrl(workId, newWorkUrl);
+
+        //then
+        assertThat(updatedWork.getWorkUrl()).isEqualTo(newWorkUrl);
     }
 }

@@ -78,7 +78,7 @@ class WorkGroupControllerTest {
         when(service.getMappedSingleWorkGroup(anyString())).thenReturn(groupDTOS.get(0));
 
         //when + then
-        mockMvc.perform(get("/group/single/1234"))
+        mockMvc.perform(get("/group/single/{workGroupId}", "1234"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.creationTime").value("date1"));
@@ -87,7 +87,7 @@ class WorkGroupControllerTest {
     @Test
     void givenWorkGroupId_whenDelete_thenReturnStatus() throws Exception {
         //when + then
-        mockMvc.perform(delete("/group/delete/1234"))
+        mockMvc.perform(delete("/group/delete/{workGroupId}", "1234"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
