@@ -29,9 +29,10 @@ public class WorkApplicationsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PatchMapping("/update/{applicationId}")
-    public ResponseEntity<WorkApplications> updateWorkStatus(@PathVariable String applicationId, @RequestBody String applicationStatus) {
-        var updatedWork = service.updateApplicationStatus(applicationId, applicationStatus);
+    @PatchMapping("/update/{applicationId}/{status}")
+    public ResponseEntity<WorkApplications> updateWorkStatus(@PathVariable String applicationId, @PathVariable String status) {
+        log.info(status);
+        var updatedWork = service.updateApplicationStatus(applicationId, status);
         return ResponseEntity.ok(updatedWork);
     }
 }

@@ -20,7 +20,7 @@ public class WorkGroup {
 
     private Binary cv_url;
     private String creationTime;
-    private int applied;
+    private int send;
     private int denied;
     private int inProgress;
 

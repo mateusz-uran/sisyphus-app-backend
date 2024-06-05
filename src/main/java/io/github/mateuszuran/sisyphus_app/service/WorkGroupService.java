@@ -19,4 +19,6 @@ public interface WorkGroupService {
     void deleteSingleGroup(String workGroupId);
 
     List<WorkApplications> getAllWorkApplicationsFromWorkGroup(String workGroupId);
+
+    void updateWorkGroupCounters(WorkApplications work, String status);
 }

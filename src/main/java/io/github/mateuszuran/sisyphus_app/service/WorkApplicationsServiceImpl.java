@@ -2,6 +2,7 @@ package io.github.mateuszuran.sisyphus_app.service;
 
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
+import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -39,14 +40,18 @@ public class WorkApplicationsServiceImpl implements WorkApplicationsService {
     @Override
     public void deleteWorkApplication(String applicationId) {
         var applicationToDelete = getSingleApplication(applicationId);
-        repository.deleteById(applicationId);
+        repository.delete(applicationToDelete);
     }
 
     @Override
     public WorkApplications updateApplicationStatus(String applicationId, String status) {
         var workToUpdate = getSingleApplication(applicationId);
         var newStatus = ApplicationStatus.getByUpperCaseStatus(status);
+        log.info(newStatus.name());
         workToUpdate.setStatus(newStatus);
+
+        groupServiceImpl.updateWorkGroupCounters(workToUpdate, status);
+
         return repository.save(workToUpdate);
     }
 

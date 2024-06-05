@@ -29,7 +29,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
             WorkGroup group = WorkGroup.builder()
                     .cv_url(cv)
                     .creationTime(creationTime)
-                    .applied(0)
+                    .send(0)
                     .denied(0)
                     .inProgress(0)
                     .build();
@@ -52,11 +52,16 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         }
         WorkGroup groupToUpdate = getWorkGroup(workGroupId);
         groupToUpdate.getWorkApplications().addAll(applications);
-        var appliedValue = groupToUpdate.getApplied();
+        var appliedValue = groupToUpdate.getSend();
 
         if (appliedValue != 0) {
-            groupToUpdate.setApplied(appliedValue + applications.size());
-        } else groupToUpdate.setApplied(applications.size());
+            groupToUpdate.setSend(appliedValue + applications.size());
+            groupToUpdate.setInProgress(appliedValue - groupToUpdate.getDenied());
+
+        } else {
+            groupToUpdate.setSend(applications.size());
+            groupToUpdate.setInProgress(applications.size());
+        }
 
         return repository.save(groupToUpdate);
     }
@@ -78,6 +83,25 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         return groupToFind.getWorkApplications();
     }
 
+    @Override
+    public void updateWorkGroupCounters(WorkApplications work, String status) {
+        var group = repository.findAll()
+                .stream()
+                .filter(workGroup -> workGroup.getWorkApplications() != null)
+                .filter(workGroup -> workGroup.getWorkApplications()
+                        .stream()
+                        .anyMatch(workApplications -> workApplications.getId().equals(work.getId())))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Work group not found"));
+
+        if ("DENIED".equalsIgnoreCase(status)) {
+            group.setDenied(group.getDenied() + 1);
+        } else if (group.getDenied() > 0) {
+            group.setDenied(group.getDenied() - 1);
+        }
+        repository.save(group);
+    }
+
     public WorkGroupDTO getMappedSingleWorkGroup(String workGroupId) {
         WorkGroup group = getWorkGroup(workGroupId);
         log.info(workGroupId);
@@ -85,7 +109,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                 .id(group.getId())
                 .cv_url(group.getCv_url())
                 .creationTime(group.getCreationTime())
-                .applied(group.getApplied())
+                .applied(group.getSend())
                 .denied(group.getDenied())
                 .inProgress(group.getInProgress())
                 .build();
@@ -100,7 +124,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                                 .id(group.getId())
                                 .cv_url(group.getCv_url())
                                 .creationTime(group.getCreationTime())
-                                .applied(group.getApplied())
+                                .applied(group.getSend())
                                 .denied(group.getDenied())
                                 .inProgress(group.getInProgress())
                                 .build())

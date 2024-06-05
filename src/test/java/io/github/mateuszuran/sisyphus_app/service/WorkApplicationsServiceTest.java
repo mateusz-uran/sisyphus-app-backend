@@ -64,7 +64,7 @@ public class WorkApplicationsServiceTest {
         serviceImpl.deleteWorkApplication(workApplicationId);
 
         //then
-        verify(repository).deleteById(workApplicationId);
+        verify(repository).delete(workApplication);
     }
 
     @Test

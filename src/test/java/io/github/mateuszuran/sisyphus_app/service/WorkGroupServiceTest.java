@@ -1,5 +1,6 @@
 package io.github.mateuszuran.sisyphus_app.service;
 
+import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
@@ -7,6 +8,7 @@ import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -90,7 +92,8 @@ public class WorkGroupServiceTest {
         WorkApplications application3 = WorkApplications.builder().workUrl("work3").build();
         var applicationsList = List.of(application1, application2, application3);
 
-        when(repository.save(group)).thenReturn(WorkGroup.builder().id(workGroupId).applied(applicationsList.size()).workApplications(applicationsList).build());
+        int applicationSize = applicationsList.size();
+        when(repository.save(group)).thenReturn(WorkGroup.builder().id(workGroupId).send(applicationSize).inProgress(applicationSize).workApplications(applicationsList).build());
 
         //when
         var updatedGroup = serviceImpl.updateWorkGroupWithWorkApplications(applicationsList, workGroupId);
@@ -101,7 +104,8 @@ public class WorkGroupServiceTest {
                 .hasSize(3)
                 .extracting(WorkApplications::getWorkUrl)
                 .containsExactlyInAnyOrder("work1", "work2", "work3");
-        assertThat(updatedGroup.getApplied()).isEqualTo(applicationsList.size());
+        assertThat(updatedGroup.getSend()).isEqualTo(applicationsList.size());
+        assertThat(updatedGroup.getInProgress()).isEqualTo(applicationsList.size());
 
     }
 
@@ -170,5 +174,61 @@ public class WorkGroupServiceTest {
                 .hasSize(applicationsList.size())
                 .extracting(WorkApplications::getWorkUrl)
                 .containsExactly("work1", "work2", "work3");
+    }
+
+    @Test
+    void givenWorkApplicationAndStatus_whenChangeDeniedToOther_thenDecrementCounter() {
+        //given
+        WorkApplications application = WorkApplications.builder().id("1234").status(ApplicationStatus.DENIED).build();
+        WorkGroup group = WorkGroup.builder().send(5).inProgress(3).denied(2).workApplications(List.of(application)).build();
+
+        when(repository.findAll()).thenReturn(List.of(group));
+
+        ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
+
+        // when
+        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.IN_PROGRESS.name());
+
+        // then
+        verify(repository).findAll();
+        verify(repository).save(groupCaptor.capture());
+
+        WorkGroup capturedGroup = groupCaptor.getValue();
+        assertNotNull(capturedGroup);
+
+        assertEquals(1, capturedGroup.getDenied());
+    }
+
+    @Test
+    void givenWorkApplicationAndStatus_whenChangeOtherToDenied_thenIncrementCounter() {
+        //given
+        WorkApplications application = WorkApplications.builder().id("1234").status(ApplicationStatus.SEND).build();
+        WorkGroup group = WorkGroup.builder().send(5).inProgress(3).denied(2).workApplications(List.of(application)).build();
+
+        when(repository.findAll()).thenReturn(List.of(group));
+
+        ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
+
+        // when
+        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name());
+
+        // then
+        verify(repository).findAll();
+        verify(repository).save(groupCaptor.capture());
+
+        WorkGroup capturedGroup = groupCaptor.getValue();
+        assertNotNull(capturedGroup);
+
+        assertEquals(3, capturedGroup.getDenied());
+    }
+
+    @Test
+    void givenWorkApplicationAndStatus_whenWorkGroupNotFound_thenThrowException() {
+        //given
+        WorkApplications application = WorkApplications.builder().status(ApplicationStatus.SEND).build();
+
+        //when + then
+        assertThrows(IllegalArgumentException.class, () -> serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name()));
+        verify(repository, never()).save(any());
     }
 }

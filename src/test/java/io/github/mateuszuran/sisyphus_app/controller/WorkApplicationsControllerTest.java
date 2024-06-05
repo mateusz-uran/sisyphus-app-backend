@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -67,14 +68,15 @@ class WorkApplicationsControllerTest {
     @Test
     void givenNewStatusAndApplicationId_whenUpdate_thenReturnWorkApplication() throws Exception {
         //given
+        String applicationId = "1234";
+        String status = "IN_PROGRESS";
         var newStatus = ApplicationStatus.IN_PROGRESS;
         var updatedWork = works.get(0);
         updatedWork.setStatus(newStatus);
-        when(serviceImpl.updateApplicationStatus("1234", "IN_PROGRESS")).thenReturn(updatedWork);
+        when(serviceImpl.updateApplicationStatus(applicationId, status)).thenReturn(updatedWork);
 
         //when + then
-        mockMvc.perform(patch("/applications/update/1234")
-                .content("IN_PROGRESS"))
+        mockMvc.perform(patch("/applications/update/{applicationId}/{status}", applicationId, status))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(newStatus.name()));
