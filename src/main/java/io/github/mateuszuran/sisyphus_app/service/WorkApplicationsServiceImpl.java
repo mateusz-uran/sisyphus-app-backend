@@ -47,7 +47,6 @@ public class WorkApplicationsServiceImpl implements WorkApplicationsService {
     public WorkApplications updateApplicationStatus(String applicationId, String status) {
         var workToUpdate = getSingleApplication(applicationId);
         var newStatus = ApplicationStatus.getByUpperCaseStatus(status);
-        log.info(newStatus.name());
         workToUpdate.setStatus(newStatus);
 
         groupServiceImpl.updateWorkGroupCounters(workToUpdate, status);

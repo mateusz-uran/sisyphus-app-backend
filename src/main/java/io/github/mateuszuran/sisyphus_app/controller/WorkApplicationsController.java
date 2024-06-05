@@ -31,7 +31,6 @@ public class WorkApplicationsController {
 
     @PatchMapping("/update/{applicationId}/{status}")
     public ResponseEntity<WorkApplications> updateWorkStatus(@PathVariable String applicationId, @PathVariable String status) {
-        log.info(status);
         var updatedWork = service.updateApplicationStatus(applicationId, status);
         return ResponseEntity.ok(updatedWork);
     }
