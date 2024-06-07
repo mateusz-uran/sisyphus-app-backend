@@ -5,10 +5,12 @@ import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WorkApplicationsServiceImpl implements WorkApplicationsService {
@@ -37,18 +39,27 @@ public class WorkApplicationsServiceImpl implements WorkApplicationsService {
     @Override
     public void deleteWorkApplication(String applicationId) {
         var applicationToDelete = getSingleApplication(applicationId);
+        groupServiceImpl.updateGroupWhenWorkDelete(applicationToDelete);
         repository.delete(applicationToDelete);
     }
 
     @Override
-    public WorkApplications updateApplicationStatus(String applicationId, String status) {
+    public WorkApplications updateApplicationStatus(String applicationId, String newStatus) {
         var workToUpdate = getSingleApplication(applicationId);
-        var newStatus = ApplicationStatus.getByUpperCaseStatus(status);
-        workToUpdate.setStatus(newStatus);
+        String oldStatus = workToUpdate.getStatus().name();
 
-        groupServiceImpl.updateWorkGroupCounters(workToUpdate, status);
+        if (workToUpdate.getStatus().equals(ApplicationStatus.getByUpperCaseStatus(newStatus))) {
+            // TODO: 07.06.2024 add custom exception
+            log.info("Status are equal, cant update.");
+            return null;
+        }
 
-        return repository.save(workToUpdate);
+        workToUpdate.setStatus(ApplicationStatus.getByUpperCaseStatus(newStatus));
+        var savedWork = repository.save(workToUpdate);
+
+        groupServiceImpl.updateWorkGroupCounters(savedWork, workToUpdate.getStatus().name(), oldStatus);
+
+        return savedWork;
     }
 
     @Override

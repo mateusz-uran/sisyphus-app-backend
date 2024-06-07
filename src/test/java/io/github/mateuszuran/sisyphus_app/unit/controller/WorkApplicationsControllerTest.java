@@ -1,5 +1,6 @@
-package io.github.mateuszuran.sisyphus_app.controller;
+package io.github.mateuszuran.sisyphus_app.unit.controller;
 
+import io.github.mateuszuran.sisyphus_app.controller.WorkApplicationsController;
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;

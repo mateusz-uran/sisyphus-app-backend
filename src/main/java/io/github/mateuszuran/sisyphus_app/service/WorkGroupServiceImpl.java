@@ -54,11 +54,9 @@ public class WorkGroupServiceImpl implements WorkGroupService {
 
         if (appliedValue != 0) {
             groupToUpdate.setSend(appliedValue + applications.size());
-            groupToUpdate.setInProgress(appliedValue - groupToUpdate.getDenied());
 
         } else {
             groupToUpdate.setSend(applications.size());
-            groupToUpdate.setInProgress(applications.size());
         }
 
         return repository.save(groupToUpdate);
@@ -82,8 +80,47 @@ public class WorkGroupServiceImpl implements WorkGroupService {
     }
 
     @Override
-    public void updateWorkGroupCounters(WorkApplications work, String status) {
-        var group = repository.findAll()
+    public void updateWorkGroupCounters(WorkApplications work, String newStatus, String oldStatus) {
+        var group = findGroupByGivenWorkApplication(work);
+
+        adjustCounter(group, oldStatus, -1);
+
+        adjustCounter(group, newStatus, 1);
+
+        repository.save(group);
+    }
+
+    @Override
+    public void updateGroupWhenWorkDelete(WorkApplications work) {
+        var group = findGroupByGivenWorkApplication(work);
+        var sendValue = group.getSend();
+        var inProgressValue = group.getInProgress();
+        var deniedValue = group.getDenied();
+        if ("DENIED".equalsIgnoreCase(work.getStatus().name())) {
+            group.setDenied(deniedValue - 1);
+        } else {
+            group.setSend(sendValue - 1);
+            group.setInProgress(inProgressValue - 1);
+        }
+        repository.save(group);
+    }
+
+    private void adjustCounter(WorkGroup group, String status, int adjustment) {
+        switch (status.toUpperCase()) {
+            case "SEND":
+                group.setSend(group.getSend() + adjustment);
+                break;
+            case "IN_PROGRESS":
+                group.setInProgress(group.getInProgress() + adjustment);
+                break;
+            case "DENIED":
+                group.setDenied(group.getDenied() + adjustment);
+                break;
+        }
+    }
+
+    private WorkGroup findGroupByGivenWorkApplication(WorkApplications work) {
+        return repository.findAll()
                 .stream()
                 .filter(workGroup -> workGroup.getWorkApplications() != null)
                 .filter(workGroup -> workGroup.getWorkApplications()
@@ -91,13 +128,6 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                         .anyMatch(workApplications -> workApplications.getId().equals(work.getId())))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Work group not found"));
-
-        if ("DENIED".equalsIgnoreCase(status)) {
-            group.setDenied(group.getDenied() + 1);
-        } else if (group.getDenied() > 0) {
-            group.setDenied(group.getDenied() - 1);
-        }
-        repository.save(group);
     }
 
     public WorkGroupDTO getMappedSingleWorkGroup(String workGroupId) {

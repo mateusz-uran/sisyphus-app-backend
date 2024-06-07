@@ -1,5 +1,6 @@
-package io.github.mateuszuran.sisyphus_app.controller;
+package io.github.mateuszuran.sisyphus_app.unit.controller;
 
+import io.github.mateuszuran.sisyphus_app.controller.WorkGroupController;
 import io.github.mateuszuran.sisyphus_app.dto.WorkGroupDTO;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
 import io.github.mateuszuran.sisyphus_app.service.WorkGroupServiceImpl;

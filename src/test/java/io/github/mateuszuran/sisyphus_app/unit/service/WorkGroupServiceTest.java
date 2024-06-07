@@ -1,9 +1,10 @@
-package io.github.mateuszuran.sisyphus_app.service;
+package io.github.mateuszuran.sisyphus_app.unit.service;
 
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
+import io.github.mateuszuran.sisyphus_app.service.WorkGroupServiceImpl;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -185,7 +186,7 @@ public class WorkGroupServiceTest {
         ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
 
         // when
-        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.IN_PROGRESS.name());
+        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.IN_PROGRESS.name(), application.getStatus().name());
 
         // then
         verify(repository).findAll();
@@ -208,7 +209,7 @@ public class WorkGroupServiceTest {
         ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
 
         // when
-        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name());
+        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name(), application.getStatus().name());
 
         // then
         verify(repository).findAll();
@@ -226,7 +227,50 @@ public class WorkGroupServiceTest {
         WorkApplications application = WorkApplications.builder().status(ApplicationStatus.SEND).build();
 
         //when + then
-        assertThrows(IllegalArgumentException.class, () -> serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name()));
+        assertThrows(IllegalArgumentException.class, () -> serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name(), application.getStatus().name()));
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    void givenWorkApplication_whenWorkStatusIsNotDeniedAndDelete_thenUpdateWorkGroupCounters() {
+        //given
+        WorkApplications application = WorkApplications.builder().id("1234").status(ApplicationStatus.SEND).build();
+        WorkGroup group = WorkGroup.builder().send(5).inProgress(3).denied(2).workApplications(List.of(application)).build();
+
+        when(repository.findAll()).thenReturn(List.of(group));
+
+        ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
+        //when
+        serviceImpl.updateGroupWhenWorkDelete(application);
+
+        //then
+        verify(repository).findAll();
+        verify(repository).save(groupCaptor.capture());
+
+        WorkGroup capturedGroup = groupCaptor.getValue();
+        assertNotNull(capturedGroup);
+        assertEquals(capturedGroup.getSend(), 4);
+        assertEquals(capturedGroup.getInProgress(), 2);
+    }
+
+    @Test
+    void givenWorkApplication_whenWorkStatusDeniedAndDelete_thenUpdateWorkGroupOneCounter() {
+        //given
+        WorkApplications application = WorkApplications.builder().id("1234").status(ApplicationStatus.DENIED).build();
+        WorkGroup group = WorkGroup.builder().send(5).inProgress(3).denied(2).workApplications(List.of(application)).build();
+
+        when(repository.findAll()).thenReturn(List.of(group));
+
+        ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
+        //when
+        serviceImpl.updateGroupWhenWorkDelete(application);
+
+        //then
+        verify(repository).findAll();
+        verify(repository).save(groupCaptor.capture());
+
+        WorkGroup capturedGroup = groupCaptor.getValue();
+        assertNotNull(capturedGroup);
+        assertEquals(capturedGroup.getDenied(), 1);
     }
 }

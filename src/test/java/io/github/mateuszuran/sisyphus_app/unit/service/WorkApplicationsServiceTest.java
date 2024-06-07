@@ -1,8 +1,10 @@
-package io.github.mateuszuran.sisyphus_app.service;
+package io.github.mateuszuran.sisyphus_app.unit.service;
 
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
+import io.github.mateuszuran.sisyphus_app.service.WorkApplicationsServiceImpl;
+import io.github.mateuszuran.sisyphus_app.service.WorkGroupServiceImpl;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
