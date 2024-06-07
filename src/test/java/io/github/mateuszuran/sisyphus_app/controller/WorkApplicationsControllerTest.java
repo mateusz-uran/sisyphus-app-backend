@@ -1,6 +1,5 @@
 package io.github.mateuszuran.sisyphus_app.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
@@ -16,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,8 +52,8 @@ class WorkApplicationsControllerTest {
 
         //when + then
         mockMvc.perform(post("/applications/save/1234")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(workJson))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(workJson))
                 .andExpect(status().isCreated());
     }
 

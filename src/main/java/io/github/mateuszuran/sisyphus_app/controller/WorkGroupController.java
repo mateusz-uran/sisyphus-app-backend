@@ -3,18 +3,13 @@ package io.github.mateuszuran.sisyphus_app.controller;
 import io.github.mateuszuran.sisyphus_app.dto.WorkGroupDTO;
 import io.github.mateuszuran.sisyphus_app.service.WorkGroupServiceImpl;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/group")
 @RequiredArgsConstructor

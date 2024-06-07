@@ -1,7 +1,6 @@
 package io.github.mateuszuran.sisyphus_app.controller;
 
 import io.github.mateuszuran.sisyphus_app.dto.WorkGroupDTO;
-import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
 import io.github.mateuszuran.sisyphus_app.service.WorkGroupServiceImpl;
 import org.junit.jupiter.api.BeforeEach;

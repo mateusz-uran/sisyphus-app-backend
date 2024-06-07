@@ -2,16 +2,13 @@ package io.github.mateuszuran.sisyphus_app.service;
 
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
-import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WorkApplicationsServiceImpl implements WorkApplicationsService {
@@ -30,7 +27,7 @@ public class WorkApplicationsServiceImpl implements WorkApplicationsService {
                         .appliedDate(creationTime)
                         .status(ApplicationStatus.SEND)
                         .build())
-                        .toList();
+                .toList();
 
         repository.saveAll(workApplicationList);
         groupServiceImpl.updateWorkGroupWithWorkApplications(workApplicationList, workGroupId);

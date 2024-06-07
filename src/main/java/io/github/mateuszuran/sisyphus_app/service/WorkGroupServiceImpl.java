@@ -6,7 +6,6 @@ import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class WorkGroupServiceImpl implements WorkGroupService {
     private final WorkGroupRepository repository;
     private final TimeUtil utility;
@@ -104,7 +102,6 @@ public class WorkGroupServiceImpl implements WorkGroupService {
 
     public WorkGroupDTO getMappedSingleWorkGroup(String workGroupId) {
         WorkGroup group = getWorkGroup(workGroupId);
-        log.info(workGroupId);
         return WorkGroupDTO.builder()
                 .id(group.getId())
                 .cv_url(group.getCv_url())

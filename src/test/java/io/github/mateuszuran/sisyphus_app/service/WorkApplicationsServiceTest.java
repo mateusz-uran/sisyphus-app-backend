@@ -2,9 +2,7 @@ package io.github.mateuszuran.sisyphus_app.service;
 
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
-import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
-import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 public class WorkApplicationsServiceTest {
@@ -90,7 +86,7 @@ public class WorkApplicationsServiceTest {
         //given
         String workApplicationId = "1234";
         //when
-        assertThrows(IllegalStateException.class, () -> serviceImpl.updateApplicationStatus("SEND", null));
+        assertThrows(IllegalArgumentException.class, () -> serviceImpl.updateApplicationStatus("SEND", null));
         verify(repository, never()).findById(workApplicationId);
         verify(repository, never()).save(any());
     }
