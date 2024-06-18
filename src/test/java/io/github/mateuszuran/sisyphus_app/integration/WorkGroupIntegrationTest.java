@@ -5,6 +5,7 @@ import io.github.mateuszuran.sisyphus_app.AbstractIntegrationTest;
 import io.github.mateuszuran.sisyphus_app.SisyphusAppApplication;
 import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
+import org.bson.types.Binary;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -61,7 +66,9 @@ public class WorkGroupIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void givenNothing_whenGetAllGroups_thenExpectListOfObjects() throws Exception {
-        repository.save(WorkGroup.builder().creationTime("today").build());
+        var pdf = new Binary(fakePdf());
+
+        repository.save(WorkGroup.builder().cvData(pdf).creationTime("today").build());
 
         mockMvc.perform(get("/group/all"))
                 .andExpect(status().isOk())
@@ -70,7 +77,9 @@ public class WorkGroupIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void givenWorKGroup_whenGet_thenReturnSingleObject() throws Exception {
-        WorkGroup group = WorkGroup.builder().creationTime("tomorrow").send(15).denied(4).inProgress(12).build();
+        var pdf = new Binary(fakePdf());
+
+        WorkGroup group = WorkGroup.builder().cvData(pdf).creationTime("tomorrow").send(15).denied(4).inProgress(12).build();
         var savedWorkGroup = repository.save(group);
 
         mockMvc.perform(get("/group/single/" + savedWorkGroup.getId()))
@@ -89,6 +98,11 @@ public class WorkGroupIntegrationTest extends AbstractIntegrationTest {
 
         Assertions.assertTrue(repository.findAll().isEmpty());
         Assertions.assertTrue(repository.findById(savedWorkGroup.getId()).isEmpty());
+    }
+
+    private byte[] fakePdf() throws IOException {
+        String pdfFilePath = "src/test/resources/LoremIpsum.pdf";
+        return  Files.readAllBytes(Paths.get(pdfFilePath));
     }
 
 }

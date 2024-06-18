@@ -84,7 +84,7 @@ public class WorkApplicationsIntegrationTest extends AbstractIntegrationTest {
         applicationsRepository.saveAll(List.of(work1, work2));
 
         WorkGroup group = WorkGroup.builder()
-                .cv_url(null)
+                .cvData(null)
                 .creationTime("today")
                 .send(15)
                 .denied(4)
@@ -113,7 +113,7 @@ public class WorkApplicationsIntegrationTest extends AbstractIntegrationTest {
         applicationsRepository.save(work1);
 
         WorkGroup group = WorkGroup.builder()
-                .cv_url(null)
+                .cvData(null)
                 .creationTime("today")
                 .send(15)
                 .denied(4)

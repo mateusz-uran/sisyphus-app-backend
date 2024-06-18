@@ -18,7 +18,8 @@ public class WorkGroup {
     @Id
     private String id;
 
-    private Binary cv_url;
+    private Binary cvData;
+    private String cvFileName;
     private String creationTime;
     private int send;
     private int denied;

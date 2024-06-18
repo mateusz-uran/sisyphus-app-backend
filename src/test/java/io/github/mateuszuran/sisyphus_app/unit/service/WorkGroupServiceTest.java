@@ -45,10 +45,11 @@ public class WorkGroupServiceTest {
         serviceImpl.createNewWorkGroup(mockFile);
         //then
         verify(repository).save(assertArg(arg -> {
-            byte[] cvUrlBytes = arg.getCv_url().getData();
+            byte[] cvUrlBytes = arg.getCvData().getData();
             var creationTime = arg.getCreationTime();
             assertArrayEquals(cvUrlBytes, fileContent);
             assertEquals(creationTime, time);
+            assertEquals(filename, arg.getCvFileName());
         }));
     }
 

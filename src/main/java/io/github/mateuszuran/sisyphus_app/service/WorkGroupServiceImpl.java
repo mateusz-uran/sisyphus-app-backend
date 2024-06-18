@@ -11,6 +11,7 @@ import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -24,8 +25,10 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         try {
             Binary cv = new Binary(BsonBinarySubType.BINARY, file.getBytes());
             String creationTime = utility.formatCreationTime();
+
             WorkGroup group = WorkGroup.builder()
-                    .cv_url(cv)
+                    .cvData(cv)
+                    .cvFileName(file.getOriginalFilename())
                     .creationTime(creationTime)
                     .send(0)
                     .denied(0)
@@ -130,11 +133,16 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                 .orElseThrow(() -> new IllegalArgumentException("Work group not found"));
     }
 
+    private String encodeBinaryCv(Binary groupCv) {
+        return Base64.getEncoder().encodeToString(groupCv.getData());
+    }
+
     public WorkGroupDTO getMappedSingleWorkGroup(String workGroupId) {
         WorkGroup group = getWorkGroup(workGroupId);
         return WorkGroupDTO.builder()
                 .id(group.getId())
-                .cv_url(group.getCv_url())
+                .cvData(encodeBinaryCv(group.getCvData()))
+                .cvFileName(group.getCvFileName())
                 .creationTime(group.getCreationTime())
                 .applied(group.getSend())
                 .denied(group.getDenied())
@@ -149,7 +157,8 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                 .map(group ->
                         WorkGroupDTO.builder()
                                 .id(group.getId())
-                                .cv_url(group.getCv_url())
+                                .cvData(encodeBinaryCv(group.getCvData()))
+                                .cvFileName(group.getCvFileName())
                                 .creationTime(group.getCreationTime())
                                 .applied(group.getSend())
                                 .denied(group.getDenied())
