@@ -48,6 +48,29 @@ public class WorkApplicationsIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void givenWorkGroupId_whenGetAllApplications_thenReturnListOfWorkApplications() throws Exception {
+        //given
+        WorkGroup group = WorkGroup.builder().creationTime("today").build();
+        WorkGroup savedWorkGroup = groupRepository.save(group);
+
+        WorkApplications app1 = WorkApplications.builder().workUrl("url1").build();
+        WorkApplications app2 = WorkApplications.builder().workUrl("url2").build();
+        WorkApplications app3 = WorkApplications.builder().workUrl("url3").build();
+        List<WorkApplications> appList = List.of(app1, app2, app3);
+        var savedApplications = applicationsRepository.saveAll(appList);
+
+        savedWorkGroup.setWorkApplications(savedApplications);
+        var updatedGroup = groupRepository.save(savedWorkGroup);
+
+        //when + then
+        mockMvc.perform(get("/applications/all/" + updatedGroup.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].workUrl").value("url1"))
+                .andExpect(jsonPath("$.[1].workUrl").value("url2"));
+
+    }
+
+    @Test
     void givenListOfWorkApplicationsAndWorkGroupId_whenSave_thenReturnStatusCreated() throws Exception {
         //given
         WorkGroup group = WorkGroup.builder().creationTime("tomorrow").build();

@@ -9,11 +9,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/applications")
 @RequiredArgsConstructor
 public class WorkApplicationsController {
     private final WorkApplicationsServiceImpl service;
+
+    @GetMapping("/all/{workGroupId}")
+    public ResponseEntity<List<WorkApplications>> getAllWorkApplicationsByGroup(@PathVariable String workGroupId) {
+        return ResponseEntity.ok().body(service.getAllApplicationsByWorkGroupId(workGroupId));
+    }
 
     @PostMapping("/save/{workGroupId}")
     public ResponseEntity<String> addWorkApp(@RequestBody List<WorkApplications> applications, @PathVariable String workGroupId) {
@@ -29,7 +35,6 @@ public class WorkApplicationsController {
 
     @PatchMapping("/update/{applicationId}/{status}")
     public ResponseEntity<WorkApplications> updateWorkStatus(@PathVariable String applicationId, @PathVariable String status) {
-        var updatedWork = service.updateApplicationStatus(applicationId, status);
-        return ResponseEntity.ok(updatedWork);
+        return ResponseEntity.ok().body(service.updateApplicationStatus(applicationId, status));
     }
 }
