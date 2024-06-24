@@ -24,6 +24,7 @@ public class WorkGroup {
     private int send;
     private int denied;
     private int inProgress;
+    private boolean isHired;
 
     @DocumentReference(lazy = true)
     private List<WorkApplications> workApplications;

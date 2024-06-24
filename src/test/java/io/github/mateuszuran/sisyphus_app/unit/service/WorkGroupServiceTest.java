@@ -93,7 +93,12 @@ public class WorkGroupServiceTest {
         var applicationsList = List.of(application1, application2, application3);
 
         int applicationSize = applicationsList.size();
-        when(repository.save(group)).thenReturn(WorkGroup.builder().id(workGroupId).send(applicationSize).inProgress(applicationSize).workApplications(applicationsList).build());
+        WorkGroup expectedGroup = WorkGroup.builder()
+                .id(workGroupId)
+                .send(applicationSize)
+                .inProgress(0)
+                .workApplications(applicationsList).build();
+        when(repository.save(group)).thenReturn(expectedGroup);
 
         //when
         var updatedGroup = serviceImpl.updateWorkGroupWithWorkApplications(applicationsList, workGroupId);
@@ -105,7 +110,8 @@ public class WorkGroupServiceTest {
                 .extracting(WorkApplications::getWorkUrl)
                 .containsExactlyInAnyOrder("work1", "work2", "work3");
         assertThat(updatedGroup.getSend()).isEqualTo(applicationsList.size());
-        assertThat(updatedGroup.getInProgress()).isEqualTo(applicationsList.size());
+        assertThat(updatedGroup.getSend()).isEqualTo(3);
+        assertThat(updatedGroup.getInProgress()).isEqualTo(0);
 
     }
 
@@ -187,7 +193,7 @@ public class WorkGroupServiceTest {
         ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
 
         // when
-        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.IN_PROGRESS.name(), application.getStatus().name());
+        serviceImpl.updateGroupWhenWorkUpdate(application, ApplicationStatus.IN_PROGRESS.name(), application.getStatus().name());
 
         // then
         verify(repository).findAll();
@@ -210,7 +216,7 @@ public class WorkGroupServiceTest {
         ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
 
         // when
-        serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name(), application.getStatus().name());
+        serviceImpl.updateGroupWhenWorkUpdate(application, ApplicationStatus.DENIED.name(), application.getStatus().name());
 
         // then
         verify(repository).findAll();
@@ -228,7 +234,7 @@ public class WorkGroupServiceTest {
         WorkApplications application = WorkApplications.builder().status(ApplicationStatus.SEND).build();
 
         //when + then
-        assertThrows(IllegalArgumentException.class, () -> serviceImpl.updateWorkGroupCounters(application, ApplicationStatus.DENIED.name(), application.getStatus().name()));
+        assertThrows(IllegalArgumentException.class, () -> serviceImpl.updateGroupWhenWorkUpdate(application, ApplicationStatus.DENIED.name(), application.getStatus().name()));
         verify(repository, never()).save(any());
     }
 
@@ -251,7 +257,7 @@ public class WorkGroupServiceTest {
         WorkGroup capturedGroup = groupCaptor.getValue();
         assertNotNull(capturedGroup);
         assertEquals(capturedGroup.getSend(), 4);
-        assertEquals(capturedGroup.getInProgress(), 2);
+        assertEquals(capturedGroup.getInProgress(), 3);
     }
 
     @Test

@@ -33,6 +33,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                     .send(0)
                     .denied(0)
                     .inProgress(0)
+                    .isHired(false)
                     .build();
             repository.save(group);
         } catch (Exception e) {
@@ -53,10 +54,10 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         }
         WorkGroup groupToUpdate = getWorkGroup(workGroupId);
         groupToUpdate.getWorkApplications().addAll(applications);
-        var appliedValue = groupToUpdate.getSend();
+        var sendValue = groupToUpdate.getSend();
 
-        if (appliedValue != 0) {
-            groupToUpdate.setSend(appliedValue + applications.size());
+        if (sendValue != 0) {
+            groupToUpdate.setSend(sendValue + applications.size());
 
         } else {
             groupToUpdate.setSend(applications.size());
@@ -83,12 +84,11 @@ public class WorkGroupServiceImpl implements WorkGroupService {
     }
 
     @Override
-    public void updateWorkGroupCounters(WorkApplications work, String newStatus, String oldStatus) {
+    public void updateGroupWhenWorkUpdate(WorkApplications work, String newStatus, String oldStatus) {
         var group = findGroupByGivenWorkApplication(work);
 
-        adjustCounter(group, oldStatus, -1);
-
-        adjustCounter(group, newStatus, 1);
+        adjustOldStatusCount(oldStatus, group);
+        adjustNewStatusCount(newStatus, group);
 
         repository.save(group);
     }
@@ -96,28 +96,37 @@ public class WorkGroupServiceImpl implements WorkGroupService {
     @Override
     public void updateGroupWhenWorkDelete(WorkApplications work) {
         var group = findGroupByGivenWorkApplication(work);
-        var sendValue = group.getSend();
-        var inProgressValue = group.getInProgress();
-        var deniedValue = group.getDenied();
-        if ("DENIED".equalsIgnoreCase(work.getStatus().name())) {
-            group.setDenied(deniedValue - 1);
-        } else {
-            group.setSend(sendValue - 1);
-            group.setInProgress(inProgressValue - 1);
-        }
+
+        adjustOldStatusCount(work.getStatus().name(), group);
+
         repository.save(group);
     }
 
-    private void adjustCounter(WorkGroup group, String status, int adjustment) {
-        switch (status.toUpperCase()) {
+
+    private void adjustOldStatusCount(String oldStatus, WorkGroup group) {
+        switch (oldStatus.toUpperCase()) {
             case "SEND":
-                group.setSend(group.getSend() + adjustment);
+                group.setSend(Math.max(0, group.getSend() - 1));
                 break;
             case "IN_PROGRESS":
-                group.setInProgress(group.getInProgress() + adjustment);
+                group.setInProgress(Math.max(0, group.getInProgress() - 1));
                 break;
             case "DENIED":
-                group.setDenied(group.getDenied() + adjustment);
+                group.setDenied(Math.max(0, group.getDenied() - 1));
+                break;
+        }
+    }
+
+    private void adjustNewStatusCount(String newStatus, WorkGroup group) {
+        switch (newStatus.toUpperCase()) {
+            case "SEND":
+                group.setSend(group.getSend() + 1);
+                break;
+            case "IN_PROGRESS":
+                group.setInProgress(group.getInProgress() + 1);
+                break;
+            case "DENIED":
+                group.setDenied(group.getDenied() + 1);
                 break;
         }
     }

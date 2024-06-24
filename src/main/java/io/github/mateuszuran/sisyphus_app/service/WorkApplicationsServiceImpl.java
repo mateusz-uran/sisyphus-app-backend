@@ -57,7 +57,7 @@ public class WorkApplicationsServiceImpl implements WorkApplicationsService {
         workToUpdate.setStatus(ApplicationStatus.getByUpperCaseStatus(newStatus));
         var savedWork = repository.save(workToUpdate);
 
-        groupServiceImpl.updateWorkGroupCounters(savedWork, workToUpdate.getStatus().name(), oldStatus);
+        groupServiceImpl.updateGroupWhenWorkUpdate(savedWork, workToUpdate.getStatus().name(), oldStatus);
 
         return savedWork;
     }

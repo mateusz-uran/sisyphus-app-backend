@@ -20,7 +20,8 @@ public interface WorkGroupService {
 
     List<WorkApplications> getAllWorkApplicationsFromWorkGroup(String workGroupId);
 
-    void updateWorkGroupCounters(WorkApplications work, String newStatus, String oldStatus);
+    void updateGroupWhenWorkUpdate(WorkApplications work, String newStatus, String oldStatus);
 
     void updateGroupWhenWorkDelete(WorkApplications work);
+
 }
