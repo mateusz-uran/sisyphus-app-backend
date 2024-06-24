@@ -77,7 +77,7 @@ public class WorkGroupServiceTest {
         var result = serviceImpl.getWorkGroup(workGroupId);
         //then
         assertNotNull(result);
-        assertEquals(result.getId(), workGroupId);
+        assertEquals(workGroupId, result.getId());
     }
 
     @Test
@@ -256,8 +256,8 @@ public class WorkGroupServiceTest {
 
         WorkGroup capturedGroup = groupCaptor.getValue();
         assertNotNull(capturedGroup);
-        assertEquals(capturedGroup.getSend(), 4);
-        assertEquals(capturedGroup.getInProgress(), 3);
+        assertEquals(4, capturedGroup.getSend());
+        assertEquals(3, capturedGroup.getInProgress());
     }
 
     @Test
@@ -278,7 +278,7 @@ public class WorkGroupServiceTest {
 
         WorkGroup capturedGroup = groupCaptor.getValue();
         assertNotNull(capturedGroup);
-        assertEquals(capturedGroup.getDenied(), 1);
+        assertEquals(1, capturedGroup.getDenied());
     }
 
     @Test
@@ -299,6 +299,6 @@ public class WorkGroupServiceTest {
 
         WorkGroup capturedGroup = groupCaptor.getValue();
         assertNotNull(capturedGroup);
-        assertEquals(true, capturedGroup.isHired());
+        assertTrue(capturedGroup.isHired());
     }
 }
