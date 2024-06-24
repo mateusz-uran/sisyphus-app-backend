@@ -157,4 +157,68 @@ public class WorkApplicationsIntegrationTest extends AbstractIntegrationTest {
         Assertions.assertEquals(3, updatedGroup.getDenied());
         Assertions.assertEquals(16, updatedGroup.getSend());
     }
+
+    @Test
+    void givenApplicationIdAndStatus_whenUpdateStatusToHired_thenReturnWorkApplicationAndCheckWorkGroupHiredState() throws Exception {
+        //given
+        String newStatus = "hired";
+        WorkApplications work1 = WorkApplications.builder().workUrl("work_url1").status(ApplicationStatus.IN_PROGRESS).build();
+        applicationsRepository.save(work1);
+
+        WorkGroup group = WorkGroup.builder()
+                .cvData(null)
+                .creationTime("today")
+                .send(15)
+                .denied(4)
+                .inProgress(12)
+                .isHired(false)
+                .workApplications(new ArrayList<>())
+                .build();
+        group.getWorkApplications().add(work1);
+        var savedGroup = groupRepository.save(group);
+
+        //when
+        mockMvc.perform(patch("/applications/update/" + work1.getId() + "/" + newStatus))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(newStatus.toUpperCase()));
+
+        //then
+        var updatedGroup = groupRepository.findById(savedGroup.getId()).orElseThrow();
+        Assertions.assertNotNull(updatedGroup);
+        Assertions.assertEquals(updatedGroup.getDenied(), 4);
+        Assertions.assertEquals(updatedGroup.getSend(), 15);
+        Assertions.assertEquals(updatedGroup.isHired(), true);
+    }
+
+    @Test
+    void givenApplicationIdAndStatus_whenUpdateStatusToInProgressFromHired_thenReturnWorkApplicationAndCheckWorkGroupHiredState() throws Exception {
+        //given
+        String newStatus = "in_progress";
+        WorkApplications work1 = WorkApplications.builder().workUrl("work_url1").status(ApplicationStatus.HIRED).build();
+        applicationsRepository.save(work1);
+
+        WorkGroup group = WorkGroup.builder()
+                .cvData(null)
+                .creationTime("today")
+                .send(15)
+                .denied(4)
+                .inProgress(12)
+                .isHired(true)
+                .workApplications(new ArrayList<>())
+                .build();
+        group.getWorkApplications().add(work1);
+        var savedGroup = groupRepository.save(group);
+
+        //when
+        mockMvc.perform(patch("/applications/update/" + work1.getId() + "/" + newStatus))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(newStatus.toUpperCase()));
+
+        //then
+        var updatedGroup = groupRepository.findById(savedGroup.getId()).orElseThrow();
+        Assertions.assertNotNull(updatedGroup);
+        Assertions.assertEquals(updatedGroup.getDenied(), 4);
+        Assertions.assertEquals(updatedGroup.getSend(), 15);
+        Assertions.assertEquals(updatedGroup.isHired(), false);
+    }
 }

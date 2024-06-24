@@ -280,4 +280,25 @@ public class WorkGroupServiceTest {
         assertNotNull(capturedGroup);
         assertEquals(capturedGroup.getDenied(), 1);
     }
+
+    @Test
+    void givenWorkApplication_whenStatusIsHired_thenToggleWorkGroup() {
+        //given
+        WorkApplications application = WorkApplications.builder().id("1234").status(ApplicationStatus.HIRED).build();
+        WorkGroup group = WorkGroup.builder().send(5).inProgress(3).denied(2).workApplications(List.of(application)).build();
+
+        when(repository.findAll()).thenReturn(List.of(group));
+
+        ArgumentCaptor<WorkGroup> groupCaptor = ArgumentCaptor.forClass(WorkGroup.class);
+        //when
+        serviceImpl.updateGroupWhenWorkUpdate(application, "hired", "in_progress");
+
+        //then
+        verify(repository).findAll();
+        verify(repository).save(groupCaptor.capture());
+
+        WorkGroup capturedGroup = groupCaptor.getValue();
+        assertNotNull(capturedGroup);
+        assertEquals(true, capturedGroup.isHired());
+    }
 }

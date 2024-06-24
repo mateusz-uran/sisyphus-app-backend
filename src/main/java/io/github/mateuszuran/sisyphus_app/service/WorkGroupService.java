@@ -23,5 +23,4 @@ public interface WorkGroupService {
     void updateGroupWhenWorkUpdate(WorkApplications work, String newStatus, String oldStatus);
 
     void updateGroupWhenWorkDelete(WorkApplications work);
-
 }

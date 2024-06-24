@@ -114,6 +114,8 @@ public class WorkGroupServiceImpl implements WorkGroupService {
             case "DENIED":
                 group.setDenied(Math.max(0, group.getDenied() - 1));
                 break;
+            case "HIRED":
+                group.setHired(false);
         }
     }
 
@@ -128,6 +130,8 @@ public class WorkGroupServiceImpl implements WorkGroupService {
             case "DENIED":
                 group.setDenied(group.getDenied() + 1);
                 break;
+            case "HIRED":
+                group.setHired(true);
         }
     }
 
