@@ -6,6 +6,7 @@ import io.github.mateuszuran.sisyphus_app.model.WorkGroup;
 import io.github.mateuszuran.sisyphus_app.repository.WorkGroupRepository;
 import io.github.mateuszuran.sisyphus_app.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Base64;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WorkGroupServiceImpl implements WorkGroupService {
@@ -90,6 +92,9 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         adjustOldStatusCount(oldStatus, group);
         adjustNewStatusCount(newStatus, group);
 
+
+        log.info(String.valueOf(group.isHired()));
+
         repository.save(group);
     }
 
@@ -98,6 +103,8 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         var group = findGroupByGivenWorkApplication(work);
 
         adjustOldStatusCount(work.getStatus().name(), group);
+
+        log.info(String.valueOf(group.isHired()));
 
         repository.save(group);
     }
@@ -160,6 +167,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                 .applied(group.getSend())
                 .denied(group.getDenied())
                 .inProgress(group.getInProgress())
+                .isHired(group.isHired())
                 .build();
     }
 
@@ -176,6 +184,7 @@ public class WorkGroupServiceImpl implements WorkGroupService {
                                 .applied(group.getSend())
                                 .denied(group.getDenied())
                                 .inProgress(group.getInProgress())
+                                .isHired(group.isHired())
                                 .build())
                 .toList();
     }
