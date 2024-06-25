@@ -1,5 +1,6 @@
 package io.github.mateuszuran.sisyphus_app.unit.service;
 
+import io.github.mateuszuran.sisyphus_app.dto.WorkApplicationDTO;
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
@@ -40,9 +41,10 @@ public class WorkApplicationsServiceTest {
         //given
         String workGroupId = "123";
         WorkApplications application1 = WorkApplications.builder().workUrl("work1").build();
+        WorkApplicationDTO applicationDTO = WorkApplicationDTO.builder().workUrl("work1").build();
 
         //when
-        serviceImpl.createWorkApplication(List.of(application1), workGroupId);
+        serviceImpl.createWorkApplication(List.of(applicationDTO), workGroupId);
 
         //then
         verify(repository).saveAll(assertArg(arg -> {

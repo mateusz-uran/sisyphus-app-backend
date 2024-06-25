@@ -1,5 +1,6 @@
 package io.github.mateuszuran.sisyphus_app.service;
 
+import io.github.mateuszuran.sisyphus_app.dto.WorkApplicationDTO;
 import io.github.mateuszuran.sisyphus_app.model.ApplicationStatus;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.repository.WorkApplicationsRepository;
@@ -20,12 +21,12 @@ public class WorkApplicationsServiceImpl implements WorkApplicationsService {
     private final TimeUtil timeUtil;
 
     @Override
-    public void createWorkApplication(List<WorkApplications> applications, String workGroupId) {
+    public void createWorkApplication(List<WorkApplicationDTO> applications, String workGroupId) {
         String creationTime = timeUtil.formatCreationTime();
         var workApplicationList = applications
                 .stream()
                 .map(work -> WorkApplications.builder()
-                        .workUrl(work.getWorkUrl())
+                        .workUrl(work.workUrl())
                         .appliedDate(creationTime)
                         .status(ApplicationStatus.SEND)
                         .build())

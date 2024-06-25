@@ -187,7 +187,7 @@ public class WorkApplicationsIntegrationTest extends AbstractIntegrationTest {
         Assertions.assertNotNull(updatedGroup);
         Assertions.assertEquals(updatedGroup.getDenied(), 4);
         Assertions.assertEquals(updatedGroup.getSend(), 15);
-        Assertions.assertEquals(updatedGroup.isHired(), true);
+        Assertions.assertTrue(updatedGroup.isHired());
     }
 
     @Test
@@ -219,6 +219,6 @@ public class WorkApplicationsIntegrationTest extends AbstractIntegrationTest {
         Assertions.assertNotNull(updatedGroup);
         Assertions.assertEquals(updatedGroup.getDenied(), 4);
         Assertions.assertEquals(updatedGroup.getSend(), 15);
-        Assertions.assertEquals(updatedGroup.isHired(), false);
+        Assertions.assertFalse(updatedGroup.isHired());
     }
 }

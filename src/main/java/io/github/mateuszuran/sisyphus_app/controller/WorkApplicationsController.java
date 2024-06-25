@@ -1,5 +1,6 @@
 package io.github.mateuszuran.sisyphus_app.controller;
 
+import io.github.mateuszuran.sisyphus_app.dto.WorkApplicationDTO;
 import io.github.mateuszuran.sisyphus_app.model.WorkApplications;
 import io.github.mateuszuran.sisyphus_app.service.WorkApplicationsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class WorkApplicationsController {
     }
 
     @PostMapping("/save/{workGroupId}")
-    public ResponseEntity<String> addWorkApp(@RequestBody List<WorkApplications> applications, @PathVariable String workGroupId) {
+    public ResponseEntity<String> addWorkApp(@RequestBody List<WorkApplicationDTO> applications, @PathVariable String workGroupId) {
         service.createWorkApplication(applications, workGroupId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
