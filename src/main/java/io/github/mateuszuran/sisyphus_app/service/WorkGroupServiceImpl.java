@@ -92,9 +92,6 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         adjustOldStatusCount(oldStatus, group);
         adjustNewStatusCount(newStatus, group);
 
-
-        log.info(String.valueOf(group.isHired()));
-
         repository.save(group);
     }
 
@@ -103,8 +100,6 @@ public class WorkGroupServiceImpl implements WorkGroupService {
         var group = findGroupByGivenWorkApplication(work);
 
         adjustOldStatusCount(work.getStatus().name(), group);
-
-        log.info(String.valueOf(group.isHired()));
 
         repository.save(group);
     }

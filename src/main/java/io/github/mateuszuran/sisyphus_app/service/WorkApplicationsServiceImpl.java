@@ -23,6 +23,9 @@ public class WorkApplicationsServiceImpl implements WorkApplicationsService {
     @Override
     public void createWorkApplication(List<WorkApplicationDTO> applications, String workGroupId) {
         String creationTime = timeUtil.formatCreationTime();
+
+        // TODO: check if applications list is empty, if so throw exception or something
+
         var workApplicationList = applications
                 .stream()
                 .map(work -> WorkApplications.builder()
